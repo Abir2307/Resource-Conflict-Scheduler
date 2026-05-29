@@ -1,0 +1,20 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>Create Account</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div th:replace="~{fragments/site-shell :: siteNav('home')}"></div>
+<main class="auth-page">
+    <div class="auth-page__intro">
+        <p class="eyebrow">Access</p>
+        <h1>Create account</h1>
+        <p>Register through the modal panel and keep the page focused on navigation.</p>
+    </div>
+    <div th:replace="~{fragments/site-shell :: authModals}"></div>
+</main>
+<script src="/js/site.js"></script>
+</body>
+</html>

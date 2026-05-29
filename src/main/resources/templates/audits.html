@@ -1,0 +1,24 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>Audits</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div th:replace="~{fragments/site-shell :: siteNav('audits')}"></div>
+
+<table border="1">
+    <tr><th>ID</th><th>Created</th><th>Summary</th><th>Actions</th></tr>
+    <tr th:each="a : ${audits}">
+        <td th:text="${a.id}"></td>
+        <td th:text="${a.createdAt}"></td>
+        <td th:text="${a.summary}"></td>
+        <td><a th:href="@{/audits/{id}(id=${a.id})}">View</a></td>
+    </tr>
+</table>
+
+<script src="/js/site.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>Schedule Report</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<h1>Schedule Report</h1>
+<form method="get" action="/simulate/ui" style="margin-bottom: 1rem;">
+    <label>Budget for suggested fixes:
+        <input type="number" name="budget" min="0" step="0.01" th:value="${budget}" required />
+    </label>
+    <label>Estimated delivery time (hours):
+        <input type="number" name="deliveryEtaHours" min="0" step="1" th:value="${deliveryEtaHours}" required />
+    </label>
+    <button type="submit">Recalculate safety</button>
+</form>
+<div>
+    <strong>Generated:</strong> <span th:text="${report.generatedAt()}"></span><br/>
+    <strong>Summary:</strong> <span th:text="${report.summary()}"></span>
+</div>
+
+<h2>Safety Check</h2>
+<div th:if="${safety != null}">
+    <p><strong>Current state:</strong> <span th:text="${safety.currentSafe ? 'Safe' : 'Unsafe'}"></span></p>
+    <p><strong>After suggested changes:</strong> <span th:text="${safety.safeAfterSuggestedChanges ? 'Safe' : 'Still unsafe'}"></span></p>
+    <p><strong>Advice:</strong> <span th:text="${safety.summary}"></span></p>
+    <p th:if="${not #lists.isEmpty(safety.requestedSequence)}"><strong>Entered sequence:</strong>
+        <span th:text="${sequence}"></span>
+    </p>
+    <p th:if="${not #lists.isEmpty(safety.requestedSequence)}"><strong>Entered sequence status:</strong>
+        <span th:text="${safety.requestedSequenceSafe ? 'Safe' : 'Not safe - suggested route shown below'}"></span>
+    </p>
+
+    <div th:if="${not #lists.isEmpty(safety.safeRoute)}">
+        <h3 th:text="${safety.requestedSequenceSafe ? 'Safe route' : 'Suggested safe route'}"></h3>
+        <ol>
+            <li th:each="step : ${safety.safeRoute}" th:text="${step}"></li>
+        </ol>
+    </div>
+
+    <div th:if="${not #maps.isEmpty(safety.extraResourcesBySkill)}">
+        <h3>Extra resources needed</h3>
+        <table border="1">
+            <tr><th>Skill</th><th>Extra resources</th></tr>
+            <tr th:each="entry : ${safety.extraResourcesBySkill}">
+                <td th:text="${entry.key}"></td>
+                <td th:text="${entry.value}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <div th:if="${not #maps.isEmpty(safety.extraAssetsById)}">
+        <h3>Extra assets needed</h3>
+        <table border="1">
+            <tr><th>Asset ID</th><th>Extra quantity</th></tr>
+            <tr th:each="entry : ${safety.extraAssetsById}">
+                <td th:text="${entry.key}"></td>
+                <td th:text="${entry.value}"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<h2>Assignments</h2>
+<table border="1">
+    <tr><th>Task</th><th>Resource</th><th>Start</th><th>End</th><th>Score</th></tr>
+    <tr th:each="a : ${report.assignments}">
+        <td th:text="${a.task().title()}"></td>
+        <td th:text="${a.resource().name()}"></td>
+        <td th:text="${a.start()}"></td>
+        <td th:text="${a.end()}"></td>
+        <td th:text="${a.score()}"></td>
+    </tr>
+</table>
+
+<p><a href="/">Back</a></p>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title th:text="${title}">Task</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div th:replace="~{fragments/site-shell :: siteNav('tasks')}"></div>
+
+<form id="taskForm" method="post" th:action="${action}" onsubmit="prepareSelections(event)">
+    <input type="hidden" name="id" th:value="${form.id}" />
+    <input type="hidden" name="assigneeUsernames" id="assigneeUsernamesHidden" />
+    <input type="hidden" name="requiredAssetIds" id="requiredAssetIdsHidden" />
+    <label>Project ID: <input name="projectId" th:value="${form.projectId}" /></label><br/>
+    <label>Title: <input name="title" th:value="${form.title}" /></label><br/>
+    <label>Duration hours: <input type="number" min="1" name="durationHours" th:value="${form.durationHours}" /></label><br/>
+    <label>Required skills: <input name="requiredSkills" th:value="${form.requiredSkills}" /> <button type="button" id="skill-search" onclick="searchAssignees()">Search</button> <button type="button" id="skill-reset" onclick="resetAssignees()">Reset</button></label><br/>
+    <label>Preferred start: <input type="datetime-local" name="preferredStart" th:value="${form.preferredStart}" /></label><br/>
+    <label>Deadline: <input type="datetime-local" name="deadline" th:value="${form.deadline}" /></label><br/>
+    <label>Assignees: <select id="assignees" multiple size="6">
+        <option th:each="u : ${allUsers}" th:value="${u.username}" th:text="${u.displayName} + ' (' + u.username + ')'" th:attr="data-skills=${u.skillsCsv}" th:selected="${form.assigneeUsernames != null and form.assigneeUsernames.contains(u.username)}"></option>
+    </select></label><br/>
+    <label>Required assets: <select id="assets" multiple size="6">
+        <option th:each="a : ${allAssets}" th:value="${a.id()}" th:text="${a.name()}" th:selected="${form.requiredAssetIds != null and form.requiredAssetIds.contains(a.id())}"></option>
+    </select></label><br/>
+    <label>Priority: <input type="number" min="1" max="10" name="priority" th:value="${form.priority}" /></label><br/>
+    <label>Dependency task IDs: <input name="dependencyTaskIds" th:value="${form.dependencyTaskIds}" /></label><br/>
+    <label>Location: <input name="location" th:value="${form.location}" /></label><br/>
+    <button type="submit">Save</button>
+</form>
+
+<script src="/js/site.js"></script>
+<script>
+    function searchAssignees() {
+        const skillsRaw = document.querySelector('input[name="requiredSkills"]').value || '';
+        const skills = skillsRaw.split(',').map(s => s.trim().toLowerCase()).filter(s => s.length > 0);
+        const options = document.querySelectorAll('#assignees option');
+        options.forEach(opt => {
+            const uskills = (opt.getAttribute('data-skills') || '').toLowerCase();
+            const match = skills.length === 0 || skills.some(sk => uskills.includes(sk));
+            opt.style.display = match ? '' : 'none';
+        });
+    }
+    function resetAssignees() {
+        const options = document.querySelectorAll('#assignees option');
+        options.forEach(opt => { opt.style.display = ''; });
+    }
+    function prepareSelections(event) {
+        // gather selected assignees
+        const assignees = Array.from(document.querySelectorAll('#assignees option'))
+            .filter(o => o.selected && o.style.display !== 'none')
+            .map(o => o.value);
+        document.getElementById('assigneeUsernamesHidden').value = assignees.join(',');
+        // gather selected assets
+        const assets = Array.from(document.querySelectorAll('#assets option'))
+            .filter(o => o.selected)
+            .map(o => o.value);
+        document.getElementById('requiredAssetIdsHidden').value = assets.join(',');
+        return true;
+    }
+</script>
+
+</body>
+</html>
