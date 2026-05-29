@@ -1,0 +1,69 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>Admin Profiles</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div th:replace="~{fragments/site-shell :: siteNav('home')}"></div>
+
+<section class="page-note">
+    <p class="eyebrow">Admin review</p>
+    <h1>User profiles</h1>
+    <p>Approve skills, location, and salary after the user updates their profile.</p>
+</section>
+
+<form method="get" action="/admin/users/search" style="margin-bottom: 1rem;">
+    <label>Search users
+        <input name="query" th:value="${searchQuery}" placeholder="alice" />
+    </label>
+    <button type="submit">Search</button>
+</form>
+
+<table border="1">
+    <thead>
+    <tr><th>Resource</th><th>Username</th><th>Skills</th><th>Location</th><th>Salary</th><th>Skills</th><th>Location</th><th>Salary</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="p : ${profiles}">
+        <td th:text="${p.displayName()}"></td>
+        <td th:text="${p.username()}"></td>
+        <td th:text="${p.skillsCsv()}"></td>
+        <td th:text="${p.location()}"></td>
+        <td th:text="${p.salaryPerHour()}"></td>
+        <td th:text="${p.skillsVerified() ? 'Verified' : 'Pending'}"></td>
+        <td th:text="${p.locationVerified() ? 'Verified' : 'Pending'}"></td>
+        <td th:text="${p.salaryVerified() ? 'Verified' : 'Pending'}"></td>
+        <td>
+            <form th:action="@{/admin/users/{username}/verify(username=${p.username()})}" method="post" class="inline-form">
+                <label><input type="checkbox" name="skills" checked /> Skills</label>
+                <label><input type="checkbox" name="location" checked /> Location</label>
+                <label><input type="checkbox" name="salary" checked /> Salary</label>
+                <button type="submit">Verify selected</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<section th:if="${not #strings.isEmpty(selectedUsername)}" style="margin-top: 1rem;">
+    <h2 th:text="${'Task status for ' + selectedUsername}"></h2>
+    <table border="1">
+        <thead>
+        <tr><th>Task</th><th>Deadline</th><th>Status</th><th>Assignees</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${selectedTasks}">
+            <td th:text="${t.title()}"></td>
+            <td th:text="${t.deadline()}"></td>
+            <td th:text="${selectedTaskStatuses.containsKey(t.id()) ? (selectedTaskStatuses[t.id()] ? 'Done' : 'Not done') : 'Not set'}"></td>
+            <td th:text="${t.assigneeUsernames()}"></td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+
+<script src="/js/site.js"></script>
+</body>
+</html>

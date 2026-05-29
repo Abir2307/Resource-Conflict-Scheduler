@@ -1,0 +1,78 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>My Account</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div th:replace="~{fragments/site-shell :: siteNav('home')}"></div>
+
+<section class="page-note">
+    <p class="eyebrow">Account</p>
+    <h1>My Account</h1>
+    <p>Signed in as <strong th:text="${username}"></strong> with role <strong th:text="${roleLabel}"></strong>.</p>
+    <p>Assigned tasks: <strong th:text="${assignedTaskCount}"></strong></p>
+    <p th:if="${param.updated}">Profile updated. Pending fields will need admin verification again.</p>
+</section>
+
+<section class="card" th:if="${currentRole != 'ADMIN'}">
+    <h2>Profile</h2>
+    <form method="post" th:action="@{/account/profile}">
+        <label>Display name
+            <input name="displayName" th:value="${profileForm.displayName()}" placeholder="Alice Johnson" />
+        </label><br/>
+        <label>Skills (comma separated)
+            <input name="skillsCsv" th:value="${profileForm.skillsCsv()}" placeholder="JAVA, SQL, REACT" />
+        </label><br/>
+        <label>Location
+            <input name="location" th:value="${profileForm.location()}" />
+        </label><br/>
+        <label>Salary per hour
+            <input type="number" min="0" step="0.01" name="salaryPerHour" th:value="${profileForm.salaryPerHour()}" />
+        </label><br/>
+        <button type="submit">Save profile</button>
+    </form>
+    <div style="margin-top:1rem; border-top:1px dashed #ddd; padding-top:1rem;">
+        <h3>Request weekly availability change</h3>
+        <form method="post" action="/resources/request">
+            <label>Available hours for this week: <input type="number" min="0" max="50" name="requestedHours" value="40" required /></label>
+            <button type="submit">Request change (applies until Sunday)</button>
+        </form>
+        <p style="font-size:.9rem;color:#666;">Requests are submitted for admin approval. If approved, availability will apply until the coming Sunday and reset on Monday to the default max hours.</p>
+    </div>
+    <div class="profile-status">
+        <p>Skills status: <strong th:text="${profile.skillsVerified() ? 'Verified' : 'Pending admin verification'}"></strong></p>
+        <p>Location status: <strong th:text="${profile.locationVerified() ? 'Verified' : 'Pending admin verification'}"></strong></p>
+        <p>Salary status: <strong th:text="${profile.salaryVerified() ? 'Verified' : 'Pending admin verification'}"></strong></p>
+    </div>
+</section>
+
+<table border="1">
+    <thead>
+    <tr><th>ID</th><th>Project</th><th>Title</th><th>Deadline</th><th>Status</th><th>Assignees</th><th>Priority</th><th>Location</th><th>Update</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="t : ${assignedTasks}">
+        <td th:text="${t.id()}"></td>
+        <td th:text="${t.projectId()}"></td>
+        <td th:text="${t.title()}"></td>
+        <td th:text="${t.deadline()}"></td>
+        <td th:text="${taskStatuses.containsKey(t.id()) ? (taskStatuses[t.id()] ? 'Done' : 'Not done') : 'Not set'}"></td>
+        <td th:text="${t.assigneeUsernames()}"></td>
+        <td th:text="${t.priority()}"></td>
+        <td th:text="${t.location()}"></td>
+        <td>
+            <form method="post" action="/tasks/status" class="inline-form">
+                <input type="hidden" name="taskId" th:value="${t.id()}" />
+                <button type="submit" name="completed" value="true">Done</button>
+                <button type="submit" name="completed" value="false">Not done</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script src="/js/site.js"></script>
+</body>
+</html>

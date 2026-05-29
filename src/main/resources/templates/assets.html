@@ -1,0 +1,72 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>Assets</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div th:replace="~{fragments/site-shell :: siteNav('assets')}"></div>
+<section class="page-note">
+    <p class="eyebrow">Materials</p>
+    <h1>Assets</h1>
+    </section>
+<p>
+    <button th:if="${isAdmin}" type="button" id="refresh-assets">Refresh</button>
+    <button th:if="${isAdmin}" type="button" id="add-asset-button" class="button-link">Add Asset</button>
+</p>
+
+<table border="1">
+    <thead>
+    <tr><th>ID</th><th>Name</th><th>Category</th><th>Total Qty</th><th>Allocated</th><th>Available</th><th>Unit</th><th>Cost/unit</th><th>ETA (hrs)</th><th>Depends on</th><th>Supplier</th><th>Location</th><th>Notes</th><th th:if="${isAdmin}">Actions</th></tr>
+    </thead>
+    <tbody id="assets-body">
+    <tr th:each="row: ${assetRows}" th:with="a=${row.asset()}" th:attr="data-id=${a.id()},data-name=${a.name()},data-category=${a.category()},data-quantity=${a.quantity()},data-unit=${a.unit()},data-cost=${a.costPerPiece()},data-eta=${a.estimatedArrivalHours()},data-supplier=${a.supplierNodeId()},data-dependencies=${a.dependencyAssetIds()},data-location=${a.location()},data-notes=${a.notes()}">
+        <td th:text="${a.id()}"></td>
+        <td th:text="${a.name()}"></td>
+        <td th:text="${a.category()}"></td>
+        <td th:text="${a.quantity()}"></td>
+        <td th:text="${row.allocatedCount()}"></td>
+        <td th:text="${row.availableCount()}"></td>
+        <td th:text="${a.unit()}"></td>
+        <td th:text="${a.costPerPiece()}"></td>
+        <td th:text="${a.estimatedArrivalHours()}"></td>
+        <td th:text="${a.dependencyAssetIds()}"></td>
+        <td th:text="${a.supplierNodeId()}"></td>
+        <td th:text="${a.location()}"></td>
+        <td th:text="${a.notes()}"></td>
+        <td th:if="${isAdmin}">
+            <button type="button" class="open-asset-modal">Edit</button>
+            <button type="button" class="delete-asset" th:attr="data-id=${a.id()}">Delete</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Asset modal -->
+<div id="asset-modal" class="asset-modal" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center;">
+    <div class="asset-modal-backdrop" style="position:fixed; inset:0; background:rgba(0,0,0,0.4);"></div>
+    <div class="asset-modal-panel" style="background:#fff; padding:1rem; width:520px; max-width:95%; z-index:10; position:relative;">
+        <h2 id="asset-modal-title">Add Asset</h2>
+        <form id="asset-modal-form" method="post" action="/assets/save">
+            <input type="hidden" name="id" id="asset-id" />
+            <div><label>Name: <input name="name" id="asset-name" required /></label></div>
+            <div><label>Category: <select name="category" id="asset-category"><option>EQUIPMENT</option><option>INVENTORY</option></select></label></div>
+            <div><label>Quantity: <input type="number" min="0" name="quantity" id="asset-quantity" /></label></div>
+            <div><label>Unit: <input name="unit" id="asset-unit" /></label></div>
+            <div><label>Location: <input name="location" id="asset-location" /></label></div>
+            <div><label>Notes: <input name="notes" id="asset-notes" /></label></div>
+            <div><label>Depends on asset ids (csv): <input name="dependencyAssetIds" id="asset-dependencies" /></label></div>
+            <div><label>Cost per piece: <input type="number" step="0.01" name="costPerPiece" id="asset-cost" /></label></div>
+            <div><label>Estimated arrival (hours): <input type="number" name="estimatedArrivalHours" id="asset-eta" placeholder="0 if unknown" /></label></div>
+            <div><label>Supplier node id: <input name="supplierNodeId" id="asset-supplier" /></label></div>
+            <div style="margin-top:0.5rem;"><button type="submit">Save</button> <button type="button" id="asset-cancel">Cancel</button></div>
+        </form>
+    </div>
+</div>
+
+<script src="/js/site.js"></script>
+<script src="/js/assets-modal.js"></script>
+
+</body>
+</html>

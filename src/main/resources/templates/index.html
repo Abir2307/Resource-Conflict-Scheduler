@@ -1,0 +1,50 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>Resource Scheduler</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div th:replace="~{fragments/site-shell :: siteNav('home')}"></div>
+
+<section>
+    <div class="hero-banner">
+        <p class="eyebrow">Operations console</p>
+        <h1>Coordinate resources, tasks and audits from one place.</h1>
+        <div class="hero-actions" th:if="${currentRole == 'GUEST'}">
+            <a class="primary-link" href="#login-modal">Sign in</a>
+            <a class="secondary-link" href="#register-modal">Register</a>
+        </div>
+    </div>
+    <div class="hero-grid">
+        <div class="hero-card">
+            <h2 th:text="${resourceCount}"></h2>
+            <a href="/resources">Open resources</a>
+        </div>
+        <div class="hero-card">
+            <h2 th:text="${taskCount}"></h2>
+            <a href="/tasks">Open tasks</a>
+        </div>
+        <div class="hero-card">
+            <h2 th:text="${assetCount}"></h2>
+            <a href="/assets">Open assets</a>
+        </div>
+        <div class="hero-card">
+            <h2 th:text="${auditCount}"></h2>
+            <a href="/audits">Open audits</a>
+        </div>
+        <div class="hero-card">
+            <p class="eyebrow">Signed in</p>
+            <h2 th:text="${currentUsername}"></h2>
+            <p th:text="${currentRole}"></p>
+        </div>
+    </div>
+</section>
+
+<div th:replace="~{fragments/site-shell :: authModals}"></div>
+
+<script src="/js/site.js"></script>
+
+</body>
+</html>

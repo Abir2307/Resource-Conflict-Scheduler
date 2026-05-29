@@ -1,0 +1,23 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title th:text="${title}">Resource</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div th:replace="~{fragments/site-shell :: siteNav('resources')}"></div>
+
+<form method="post" th:action="${action}">
+    <input type="hidden" name="id" th:value="${form.id}" />
+    <label>Name: <input name="name" th:value="${form.name}" th:attr="readonly=${form.id != null and form.id != '' ? 'readonly' : null}" /></label><br/>
+    <p style="font-size:.9rem;color:#666;">(Admin may only edit Max workload hours and Available hours; other fields are read-only.)</p>
+    <label>Max workload hours: <input type="number" min="1" name="maxWorkloadHours" th:value="${form.maxWorkloadHours}" required /></label><br/>
+    <label>Available hours for current week: <input type="number" min="0" name="availableHoursPerWeek" th:value="${form.availableHoursPerWeek}" required /></label><br/>
+    <button type="submit">Save</button>
+</form>
+
+<script src="/js/site.js"></script>
+
+</body>
+</html>
