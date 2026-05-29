@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,9 +17,8 @@ public class AuditRecord {
     private LocalDateTime createdAt;
 
     private String summary;
-
-    @Lob
-    @Column(columnDefinition = "CLOB")
+    
+    @Column(columnDefinition = "TEXT")
     private String payload;
 
     public AuditRecord() {
